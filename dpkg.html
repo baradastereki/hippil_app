@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiPill</title>
+    <style>
+        * { font-family: Arial; margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: var(--bg); color: var(--txt); text-align: center; direction: rtl; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
+        .app { max-width: 400px; margin: 20px auto; padding: 20px; background: var(--bg); border-radius: 10px; flex: 1; overflow-y: auto; }
+        .title-bar { font-size: 20px; font-weight: bold; padding: 12px; background: var(--pri); color: #fff; border-radius: 10px 10px 0 0; }
+        .tab-content { display: none; padding: 20px; }
+        .active { display: block; }
+        input, button, select { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid var(--brd); }
+        button { background: var(--pri); color: var(--txt); cursor: pointer; }
+        .bottom-tabs { display: flex; justify-content: space-around; background: var(--pri); padding: 10px; width: 100%; max-width: 400px; margin: 0 auto; }
+        .tab-btn { flex: 1; background: 0; color: #fff; font-size: 16px; cursor: pointer; padding: 10px; border: none; }
+        .tab-btn.active { background: var(--act); border-radius: 8px; }
+        ul { list-style: none; padding: 0; }
+        li { background: var(--li); padding: 10px; margin: 5px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .icon-selection { display: flex; justify-content: center; gap: 10px; margin: 10px 0; }
+        .icon { font-size: 30px; cursor: pointer; padding: 10px; border-radius: 8px; border: 1px solid var(--brd); }
+        .selected { background: var(--pri); color: #fff; }
+        #progress-bar { width: 100%; height: 10px; background: var(--brd); border-radius: 5px; margin: 10px 0; }
+        #progress { height: 100%; background: var(--pri); border-radius: 5px; width: 0; }
+        .scroll-btn { position: fixed; right: 20px; background: var(--pri); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        .scroll-up { top: 20px; }
+        .scroll-down { top: 70px; }
+        :root { --pri: #007bff; --bg: #f4f4f4; --txt: #333; --brd: #ddd; --li: #eee; --act: #0056b3; }
+        [data-theme=dark] { --pri: #333; --bg: #121212; --txt: #f4f4f4; --brd: #444; --li: #222; --act: #555; }
+        [data-theme=light] { --pri: #007bff; --bg: #f4f4f4; --txt: #333; --brd: #ddd; --li: #eee; --act: #0056b3; }
+    </style>
+</head>
+<body>
+    <button class="scroll-btn scroll-up" onclick="scrollToTop()">↑</button>
+    <button class="scroll-btn scroll-down" onclick="scrollToBottom()">↓</button>
+    <div class="app">
+        <div class="title-bar">HiPill</div>
+        <div id="reminders" class="tab-content active">
+            <h2>یادآوری‌ها</h2>
+            <ul id="reminder-list"></ul>
+        </div>
+        <div id="add-pill" class="tab-content">
+            <h2>افزودن</h2>
+            <input type="text" id="pillName" placeholder="نام دارو">
+            <input type="text" id="dose" placeholder="دوز">
+            <select id="daysToTake">
+                <option value="0">امروز</option>
+                <option value="1">1 روز دیگر</option>
+                <option value="2">2 روز دیگر</option>
+                <option value="3">3 روز دیگر</option>
+                <option value="4">4 روز دیگر</option>
+                <option value="5">5 روز دیگر</option>
+                <option value="6">6 روز دیگر</option>
+                <option value="7">7 روز دیگر</option>
+                <option value="8">8 روز دیگر</option>
+                <option value="9">9 روز دیگر</option>
+                <option value="10">10 روز دیگر</option>
+                <option value="11">11 روز دیگر</option>
+                <option value="12">12 روز دیگر</option>
+                <option value="13">13 روز دیگر</option>
+                <option value="14">14 روز دیگر</option>
+                <option value="15">15 روز دیگر</option>
+                <option value="16">16 روز دیگر</option>
+                <option value="17">17 روز دیگر</option>
+                <option value="18">18 روز دیگر</option>
+                <option value="19">19 روز دیگر</option>
+                <option value="20">20 روز دیگر</option>
+                <option value="21">21 روز دیگر</option>
+                <option value="22">22 روز دیگر</option>
+                <option value="23">23 روز دیگر</option>
+                <option value="24">24 روز دیگر</option>
+                <option value="25">25 روز دیگر</option>
+                <script>
+                    for (let i = 26; i <= 365; i++) {
+                        document.write(`<option value="${i}">${i} روز دیگر</option>`);
+                    }
+                </script>
+            </select>
+            <input type="time" id="time" placeholder="زمان">
+            <div class="icon-selection">
+                <div class="icon" data-type="💊" onclick="selectIcon(this)">💊</div>
+                <div class="icon" data-type="🍼" onclick="selectIcon(this)">🍼</div>
+                <div class="icon" data-type="💉" onclick="selectIcon(this)">💉</div>
+            </div>
+            <select id="alarm">
+                <option value="1">زنگ 1</option>
+                <option value="2">زنگ 2</option>
+                <option value="3">زنگ 3</option>
+                <option value="4">زنگ 4</option>
+                <option value="5">زنگ 5</option>
+                <option value="6">زنگ 6</option>
+                <option value="7">زنگ 7</option>
+                <option value="8">زنگ 8</option>
+                <option value="9">زنگ 9</option>
+            </select>
+            <button onclick="addPill()">افزودن</button>
+        </div>
+        <div id="settings" class="tab-content">
+            <h2>تنظیمات</h2>
+            <select id="theme" onchange="changeTheme(this.value)">
+                <option value="auto">Auto</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="rog">ROG</option>
+                <option value="rgb">RGB</option>
+                <option value="lin">Lin</option>
+            </select>
+            <button onclick="exportData()">خروجی</button>
+            <input type="file" id="import" onchange="importData(this)">
+            <button onclick="testAlarm()">آزمون زنگ</button>
+        </div>
+    </div>
+    <div class="bottom-tabs">
+        <button class="tab-btn active" onclick="showTab('reminders', this)">⏰</button>
+        <button class="tab-btn" onclick="showTab('add-pill', this)">➕</button>
+        <button class="tab-btn" onclick="showTab('settings', this)">⚙️</button>
+    </div>
+    <audio id="alarm-1" src="1.mp3"></audio>
+    <audio id="alarm-2" src="2.mp3"></audio>
+    <audio id="alarm-3" src="3.mp3"></audio>
+    <audio id="alarm-4" src="4.mp3"></audio>
+    <audio id="alarm-5" src="5.mp3"></audio>
+    <audio id="alarm-6" src="6.mp3"></audio>
+    <audio id="alarm-7" src="7.mp3"></audio>
+    <audio id="alarm-8" src="8.mp3"></audio>
+    <audio id="alarm-9" src="9.mp3"></audio>
+    <script>
+        let selectedIcon = "💊";
+        function showTab(tabId, element) {
+            document.querySelectorAll(".tab-content").forEach(tab => tab.classList.remove("active"));
+            document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+            document.getElementById(tabId).classList.add("active");
+            element.classList.add("active");
+        }
+        function addPill() {
+            let name = document.getElementById("pillName").value;
+            let dose = document.getElementById("dose").value;
+            let daysToTake = document.getElementById("daysToTake").value;
+            let time = document.getElementById("time").value;
+            let alarm = document.getElementById("alarm").value;
+            if (!name || !daysToTake || !time || !dose) return alert("لطفا اطلاعات را کامل کنید");
+            let currentDate = new Date();
+            currentDate.setDate(currentDate.getDate() + parseInt(daysToTake));
+            let dateTime = `${currentDate.toISOString().split('T')[0]}T${time}:00`;
+            let data = getData();
+            data.push({ name, dose, time: dateTime, alarm, icon: selectedIcon });
+            saveData(data);
+            displayReminders();
+            scheduleNotif(name, dateTime, alarm);
+            showTab("reminders", document.querySelectorAll(".tab-btn")[0]);
+        }
+        function displayReminders() {
+            let data = getData();
+            let reminderList = document.getElementById("reminder-list");
+            reminderList.innerHTML = "";
+            data = data.filter(item => new Date(item.time) > new Date());
+            data.forEach((item, index) => {
+                let timeDiff = new Date(item.time) - new Date();
+                let hours = Math.floor(timeDiff / 3600000);
+                let minutes = Math.floor((timeDiff % 3600000) / 60000);
+                reminderList.innerHTML += `<li>${item.icon} ${item.name} - ${item.dose} - ${hours} ساعت و ${minutes} دقیقه باقی مانده
+                    <button onclick="editPill(${index})">ویرایش</button>
+                    <button onclick="deletePill(${index})">حذف</button>
+                </li>`;
+            });
+        }
+        function editPill(index) {
+            let data = getData();
+            let pill = data[index];
+            document.getElementById("pillName").value = pill.name;
+            document.getElementById("dose").value = pill.dose;
+            let date = new Date(pill.time);
+            document.getElementById("daysToTake").value = Math.floor((date - new Date()) / (1000 * 60 * 60 * 24));
+            document.getElementById("time").value = date.toTimeString().slice(0, 5);
+            document.getElementById("alarm").value = pill.alarm;
+            selectedIcon = pill.icon;
+            deletePill(index); // Remove the pill to update it later
+            showTab("add-pill", document.querySelectorAll(".tab-btn")[1]);
+        }
+        function deletePill(index) {
+            let data = getData();
+            data.splice(index, 1);
+            saveData(data);
+            displayReminders();
+        }
+        function updateProgress() {
+            let data = getData();
+            let now = new Date();
+            let completed = data.filter(item => new Date(item.time) < now).length;
+            document.getElementById("progress").style.width = data.length ? `${(completed / data.length) * 100}%` : "0%";
+        }
+        function changeTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+        }
+        function exportData() {
+            let data = JSON.stringify(getData());
+            let blob = new Blob([data], { type: "application/json" });
+            let url = URL.createObjectURL(blob);
+            let a = document.createElement("a");
+            a.href = url;
+            a.download = "hippill_backup.json";
+            a.click();
+        }
+        function importData(input) {
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let importedData = JSON.parse(event.target.result);
+                let existingData = getData();
+                saveData([...existingData, ...importedData]);
+                displayReminders();
+            };
+            reader.readAsText(input.files[0]);
+        }
+        function testAlarm() {
+            let alarm = document.getElementById("alarm").value;
+            document.getElementById(`alarm-${alarm}`).play();
+        }
+        function selectIcon(element) {
+            document.querySelectorAll(".icon").forEach(icon => icon.classList.remove("selected"));
+            element.classList.add("selected");
+            selectedIcon = element.getAttribute("data-type");
+        }
+        function scheduleNotif(name, time, alarm) {
+            let timeDiff = new Date(time) - new Date();
+            if (timeDiff > 0) {
+                setTimeout(() => {
+                    new Notification("یادآوری", { body: `وقت ${name}!` });
+                    document.getElementById(`alarm-${alarm}`).play();
+                }, timeDiff);
+            }
+        }
+        function getData() {
+            return JSON.parse(localStorage.getItem("pills")) || [];
+        }
+        function saveData(data) {
+            localStorage.setItem("pills", JSON.stringify(data));
+        }
+        function loadPills() {
+            let data = getData();
+            displayReminders();
+            changeTheme(localStorage.getItem("theme") || "auto");
+        }
+        function scrollToTop() {
+            document.querySelector('.app').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        function scrollToBottom() {
+            const app = document.querySelector('.app');
+            app.scrollTo({ top: app.scrollHeight, behavior: 'smooth' });
+        }
+        Notification.requestPermission();
+        loadPills();
+    </script>
+</body>
+</html>
