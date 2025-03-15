@@ -182,6 +182,7 @@
             let alarmElement = document.getElementById(`alarm-${alarm}`);
             if (alarmElement) {
                 alarmElement.play();
+                console.log(`Playing alarm ${alarm}`);
             } else {
                 console.error("Alarm element not found");
             }
