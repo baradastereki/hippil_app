@@ -3,145 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HiPill</title>
-    <style>
-        * { font-family: Arial; margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: var(--txt); text-align: center; direction: rtl; min-height: 100vh; display: flex; flex-direction: column; position: relative; }
-        .app { max-width: 400px; margin: 20px auto; padding: 20px; background: var(--bg); border-radius: 10px; flex: 1; overflow-y: auto; }
-        .title-bar { font-size: 20px; font-weight: bold; padding: 12px; background: var(--pri); color: #fff; border-radius: 10px 10px 0 0; }
-        .tab-content { display: none; padding: 20px; }
-        .active { display: block; }
-        input, button, select { width: 100%; margin: 10px 0; padding: 12px; border-radius: 8px; border: 1px solid var(--brd); }
-        button { background: var(--pri); color: var(--txt); cursor: pointer; }
-        .bottom-tabs { display: flex; justify-content: space-around; background: var(--pri); padding: 10px; width: 100%; max-width: 400px; margin: 0 auto; }
-        .tab-btn { flex: 1; background: 0; color: #fff; font-size: 16px; cursor: pointer; padding: 10px; border: none; }
-        .tab-btn.active { background: var(--act); border-radius: 8px; }
-        ul { list-style: none; padding: 0; }
-        li { background: var(--li); padding: 10px; margin: 5px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .icon-selection { display: flex; justify-content: center; gap: 10px; margin: 10px 0; }
-        .icon { font-size: 30px; cursor: pointer; padding: 10px; border-radius: 8px; border: 1px solid var(--brd); }
-        .selected { background: var(--pri); color: #fff; }
-        #progress-bar { width: 100%; height: 10px; background: var(--brd); border-radius: 5px; margin: 10px 0; }
-        #progress { height: 100%; background: var(--pri); border-radius: 5px; width: 0; }
-        .scroll-btn { position: fixed; right: 20px; background: var(--pri); color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .scroll-up { top: 20px; }
-        .scroll-down { top: 70px; }
-        :root { --pri: #007bff; --bg: #f4f4f4; --txt: #333; --brd: #ddd; --li: #eee; --act: #0056b3; }
-        [data-theme=dark] { --pri: #333; --bg: #121212; --txt: #f4f4f4; --brd: #444; --li: #222; --act: #555; }
-        [data-theme=light] { --pri: #007bff; --bg: #f4f4f4; --txt: #333; --brd: #ddd; --li: #eee; --act: #0056b3; }
-    </style>
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-      import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
-
-      const firebaseConfig = {
-        apiKey: "AIzaSyAkfTDtpeomUT6qZlPeV3NnrTG0vBY8-wU",
-        authDomain: "hipill-app.firebaseapp.com",
-        projectId: "hipill-app",
-        storageBucket: "hipill-app.firebasestorage.app",
-        messagingSenderId: "660387592068",
-        appId: "1:660387592068:web:0bb4ea285cbd936e128fd1",
-        measurementId: "G-GNYMW102FF"
-      };
-
-      const app = initializeApp(firebaseConfig);
-      const messaging = getMessaging(app);
-
-      function requestPermission() {
-          Notification.requestPermission().then(permission => {
-              if (permission === 'granted') {
-                  getToken(messaging, { vapidKey: 'BHUVWQge3ZZh10i7wt5SPV3D4KCGEw9X87odtwTVVUCLhIbS-_0wQyjjKHK4y-M_z5BwnrHKp3Lp5uP9amf53N4	' }).then((currentToken) => {
-                      if (currentToken) {
-                          console.log('FCM Token:', currentToken);
-                      } else {
-                          console.log('No registration token available.');
-                      }
-                  }).catch((err) => {
-                      console.log('Error retrieving token: ', err);
-                  });
-              } else {
-                  console.log('Permission not granted.');
-              }
-          });
-      }
-
-      onMessage(messaging, (payload) => {
-          const notificationTitle = payload.notification.title;
-          const notificationOptions = {
-              body: payload.notification.body,
-              icon: payload.notification.icon
-          };
-          new Notification(notificationTitle, notificationOptions);
-      });
-
-      document.addEventListener('DOMContentLoaded', () => {
-          requestPermission();
-      });
-
-      function sendFCMNotification(token, title, body) {
-          fetch('https://fcm.googleapis.com/fcm/send', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': 'key=YOUR_SERVER_KEY'
-              },
-              body: JSON.stringify({
-                  notification: { title, body, icon: 'icon.png' },
-                  to: token
-              })
-          }).then(response => {
-              console.log('Notification sent: ', response);
-          }).catch(error => {
-              console.error('Error sending notification: ', error);
-          });
-      }
-    </script>
+    <title>Hippil App</title>
 </head>
 <body>
-    <button class="scroll-btn scroll-up" onclick="scrollToTop()">↑</button>
-    <button class="scroll-btn scroll-down" onclick="scrollToBottom()">↓</button>
-    <div class="app">
-        <div class="title-bar">HiPill</div>
+    <div class="container">
+        <header class="header">
+            <div class="top-panel">
+                <button class="toggle">🍔</button>
+            </div>
+            <div class="calendar">
+                <time><abbr>ش</abbr></time>
+                <time><abbr>ی</abbr></time>
+                <time><abbr>د</abbr></time>
+                <time><abbr>س</abbr></time>
+                <time><abbr>چ</abbr></time>
+                <time><abbr>پ</abbr></time>
+                <time><abbr>ج</abbr></time>
+            </div>
+            <h5 id="currentDate">امروز، در حال بارگذاری...</h5>
+        </header>
+        <div class="content-main">
+            <img src="./Medicine Reminder App_files/undraw_doctor_kw5l.svg" alt="" class="hero">
+            <h2>بر برنامه درمانی خود نظارت کنید</h2>
+            <p>تو قوی هستی و به زودی این بیماری را شکست خواهی داد. من به قدرت و روحیه‌ی قوی تو ایمان دارم.</p>
+        </div>
+        <div class="bottom-tabs">
+            <button class="tab-btn active" onclick="showTab('reminders', this)">⏰</button>
+            <button class="tab-btn" onclick="showTab('add-pill', this)">➕</button>
+            <button class="tab-btn" onclick="showTab('settings', this)">⚙️</button>
+        </div>
         <div id="reminders" class="tab-content active">
-            <h2>یادآوری‌ها</h2>
             <ul id="reminder-list"></ul>
         </div>
         <div id="add-pill" class="tab-content">
-            <h2>افزودن</h2>
             <input type="text" id="pillName" placeholder="نام دارو">
             <input type="text" id="dose" placeholder="دوز">
             <select id="daysToTake">
-                <option value="0">امروز</option>
                 <option value="1">1 روز دیگر</option>
                 <option value="2">2 روز دیگر</option>
-                <option value="3">3 روز دیگر</option>
-                <option value="4">4 روز دیگر</option>
-                <option value="5">5 روز دیگر</option>
-                <option value="6">6 روز دیگر</option>
-                <option value="7">7 روز دیگر</option>
-                <option value="8">8 روز دیگر</option>
-                <option value="9">9 روز دیگر</option>
-                <option value="10">10 روز دیگر</option>
-                <option value="11">11 روز دیگر</option>
-                <option value="12">12 روز دیگر</option>
-                <option value="13">13 روز دیگر</option>
-                <option value="14">14 روز دیگر</option>
-                <option value="15">15 روز دیگر</option>
-                <option value="16">16 روز دیگر</option>
-                <option value="17">17 روز دیگر</option>
-                <option value="18">18 روز دیگر</option>
-                <option value="19">19 روز دیگر</option>
-                <option value="20">20 روز دیگر</option>
-                <option value="21">21 روز دیگر</option>
-                <option value="22">22 روز دیگر</option>
-                <option value="23">23 روز دیگر</option>
-                <option value="24">24 روز دیگر</option>
-                <option value="25">25 روز دیگر</option>
-                <script>
-                    for (let i = 26; i <= 365; i++) {
-                        document.write(`<option value="${i}">${i} روز دیگر</option>`);
-                    }
-                </script>
+                <!-- Add more options as needed -->
+                <option value="365">365 روز دیگر</option>
             </select>
             <input type="time" id="time" placeholder="زمان">
             <div class="icon-selection">
@@ -162,11 +63,9 @@
             </select>
             <button onclick="addPill()">افزودن</button>
         </div>
-    </div>
-    <div class="bottom-tabs">
-        <button class="tab-btn active" onclick="showTab('reminders', this)">⏰</button>
-        <button class="tab-btn" onclick="showTab('add-pill', this)">➕</button>
-        <button class="tab-btn" onclick="showTab('settings', this)">⚙️</button>
+        <div id="settings" class="tab-content">
+            <!-- Add settings content here -->
+        </div>
     </div>
     <audio id="alarm-1" src="1.mp3"></audio>
     <audio id="alarm-2" src="2.mp3"></audio>
@@ -240,11 +139,7 @@
             let timeDiff = new Date(time) - new Date();
             if (timeDiff > 0) {
                 setTimeout(() => {
-                    getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY' }).then((token) => {
-                        sendFCMNotification(token, "یادآوری", `وقت ${name}!`);
-                    }).catch((err) => {
-                        console.error('Error getting FCM token:', err);
-                    });
+                    document.getElementById(`alarm-${alarm}`).play();
                 }, timeDiff);
             }
         }
@@ -284,7 +179,12 @@
         }
         function testAlarm() {
             let alarm = document.getElementById("alarm").value;
-            document.getElementById(`alarm-${alarm}`).play();
+            let alarmElement = document.getElementById(`alarm-${alarm}`);
+            if (alarmElement) {
+                alarmElement.play();
+            } else {
+                console.error("Alarm element not found");
+            }
         }
         function selectIcon(element) {
             document.querySelectorAll(".icon").forEach(icon => icon.classList.remove("selected"));
