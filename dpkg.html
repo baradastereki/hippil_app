@@ -30,13 +30,10 @@
         [data-theme=dark] { --pri: #333; --bg: #121212; --txt: #f4f4f4; --brd: #444; --li: #222; --act: #555; }
         [data-theme=light] { --pri: #007bff; --bg: #f4f4f4; --txt: #333; --brd: #ddd; --li: #eee; --act: #0056b3; }
     </style>
-    <!-- Firebase SDK -->
     <script type="module">
-      // Import the necessary functions from the SDKs
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
       import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-messaging.js";
 
-      // Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyAkfTDtpeomUT6qZlPeV3NnrTG0vBY8-wU",
         authDomain: "hipill-app.firebaseapp.com",
@@ -47,15 +44,13 @@
         measurementId: "G-GNYMW102FF"
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const messaging = getMessaging(app);
 
-      // Request permission and get token
       function requestPermission() {
           Notification.requestPermission().then(permission => {
               if (permission === 'granted') {
-                  getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY' }).then((currentToken) => {
+                  getToken(messaging, { vapidKey: 'BHUVWQge3ZZh10i7wt5SPV3D4KCGEw9X87odtwTVVUCLhIbS-_0wQyjjKHK4y-M_z5BwnrHKp3Lp5uP9amf53N4	' }).then((currentToken) => {
                       if (currentToken) {
                           console.log('FCM Token:', currentToken);
                       } else {
@@ -70,9 +65,7 @@
           });
       }
 
-      // Handle incoming messages
       onMessage(messaging, (payload) => {
-          console.log('Message received: ', payload);
           const notificationTitle = payload.notification.title;
           const notificationOptions = {
               body: payload.notification.body,
@@ -85,7 +78,6 @@
           requestPermission();
       });
 
-      // Send FCM notification
       function sendFCMNotification(token, title, body) {
           fetch('https://fcm.googleapis.com/fcm/send', {
               method: 'POST',
@@ -170,20 +162,6 @@
             </select>
             <button onclick="addPill()">افزودن</button>
         </div>
-        <div id="settings" class="tab-content">
-            <h2>تنظیمات</h2>
-            <select id="theme" onchange="changeTheme(this.value)">
-                <option value="auto">Auto</option>
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="rog">ROG</option>
-                <option value="rgb">RGB</option>
-                <option value="lin">Lin</option>
-            </select>
-            <button onclick="exportData()">خروجی</button>
-            <input type="file" id="import" onchange="importData(this)">
-            <button onclick="testAlarm()">آزمون زنگ</button>
-        </div>
     </div>
     <div class="bottom-tabs">
         <button class="tab-btn active" onclick="showTab('reminders', this)">⏰</button>
@@ -258,11 +236,28 @@
             saveData(data);
             displayReminders();
         }
-        function updateProgress() {
+        function scheduleNotif(name, time, alarm) {
+            let timeDiff = new Date(time) - new Date();
+            if (timeDiff > 0) {
+                setTimeout(() => {
+                    getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY' }).then((token) => {
+                        sendFCMNotification(token, "یادآوری", `وقت ${name}!`);
+                    }).catch((err) => {
+                        console.error('Error getting FCM token:', err);
+                    });
+                }, timeDiff);
+            }
+        }
+        function getData() {
+            return JSON.parse(localStorage.getItem("pills")) || [];
+        }
+        function saveData(data) {
+            localStorage.setItem("pills", JSON.stringify(data));
+        }
+        function loadPills() {
             let data = getData();
-            let now = new Date();
-            let completed = data.filter(item => new Date(item.time) < now).length;
-            document.getElementById("progress").style.width = data.length ? `${(completed / data.length) * 100}%` : "0%";
+            displayReminders();
+            changeTheme(localStorage.getItem("theme") || "auto");
         }
         function changeTheme(theme) {
             document.documentElement.setAttribute("data-theme", theme);
@@ -295,30 +290,6 @@
             document.querySelectorAll(".icon").forEach(icon => icon.classList.remove("selected"));
             element.classList.add("selected");
             selectedIcon = element.getAttribute("data-type");
-        }
-        function scheduleNotif(name, time, alarm) {
-            let timeDiff = new Date(time) - new Date();
-            if (timeDiff > 0) {
-                setTimeout(() => {
-                    // Get FCM token and send notification
-                    getToken(messaging, { vapidKey: 'YOUR_PUBLIC_VAPID_KEY' }).then((token) => {
-                        sendFCMNotification(token, "یادآوری", `وقت ${name}!`);
-                    }).catch((err) => {
-                        console.error('Error getting FCM token:', err);
-                    });
-                }, timeDiff);
-            }
-        }
-        function getData() {
-            return JSON.parse(localStorage.getItem("pills")) || [];
-        }
-        function saveData(data) {
-            localStorage.setItem("pills", JSON.stringify(data));
-        }
-        function loadPills() {
-            let data = getData();
-            displayReminders();
-            changeTheme(localStorage.getItem("theme") || "auto");
         }
         function scrollToTop() {
             document.querySelector('.app').scrollTo({ top: 0, behavior: 'smooth' });
